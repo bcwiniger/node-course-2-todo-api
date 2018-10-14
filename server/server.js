@@ -8,6 +8,7 @@ const _ = require('lodash');
 var {mongoose} = require('./db/mongoose');
 var {Todo} = require('./models/todo');
 var {User} = require('./models/user');
+var {authenticate} = require('./middleware/authenticate');
 
 var app = new express();
 const port = process.env.PORT;
@@ -91,8 +92,6 @@ app.patch('/todos/:id', (req, res) => {
         }).catch((e) => res.status(400).send());
 });
 
-
-//get email and password using pick
 app.post('/users/', (req, res) => {
     let body = _.pick(req.body, ['email', 'password']);
     let user = new User(body);
@@ -106,6 +105,9 @@ app.post('/users/', (req, res) => {
         });
 });
 
+app.get('/users/me', authenticate, (req, res) => {
+    res.send(req.user);
+});
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
